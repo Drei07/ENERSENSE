@@ -25,9 +25,11 @@
             document.getElementById('voltage').textContent = data.voltage + ' V';
             document.getElementById('current').textContent = data.current + ' A';
             document.getElementById('power').textContent = data.power + ' W';
-            document.getElementById('energy').textContent = data.energy + ' Wh';
-            document.getElementById('kwh').textContent = data.kWh + ' kWh';
+            document.getElementById('energyWh').textContent = data.energyWh + ' Wh';
+            document.getElementById('energyKWh').textContent = data.energyKWh + ' kWh';
             document.getElementById('frequency').textContent = data.frequency + ' Hz';
+            document.getElementById('powerFactor').textContent = data.powerFactor;
+
         }
 
         // Fetch data every 5 seconds
@@ -95,16 +97,20 @@
             <span id="power">Loading...</span>
         </div>
         <div class="measurement">
-            <label for="energy">Energy (Wh):</label>
-            <span id="energy">Loading...</span>
+            <label for="energyWh">Energy (Wh):</label>
+            <span id="energyWh">Loading...</span>
         </div>
         <div class="measurement">
-            <label for="kwh">kWh:</label>
-            <span id="kwh">Loading...</span>
+            <label for="energyKWh">kWh:</label>
+            <span id="energyKWh">Loading...</span>
         </div>
         <div class="measurement">
             <label for="frequency">Frequency (Hz):</label>
             <span id="frequency">Loading...</span>
+        </div>
+        <div class="measurement">
+            <label for="powerFactor">powerFactor :</label>
+            <span id="powerFactor">Loading...</span>
         </div>
     </div>
 </body>
