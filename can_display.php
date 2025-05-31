@@ -1,87 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAN BUS ID</title>
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        async function fetchData() {
-            try {
-                const response = await fetch('can_receive.php');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                updateDisplay(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                // Optionally, you can display an error message on the page
-            }
-        }
-
-        function updateDisplay(data) {
-            document.getElementById('seatbeltStatus').textContent = data.seatbeltStatus + '';
-        }
-
-        // Fetch data every 5 seconds
-        setInterval(fetchData, 1000);
-        // Fetch data immediately on page load
-        window.onload = fetchData;
-    </script>
-</head>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Real-Time CAN Data</title>
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      padding: 40px;
+      text-align: center;
     }
 
-    .container {
-        max-width: 600px;
-        margin: auto;
-        background: rgb(252, 252, 252);
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      min-width: 300px;
     }
 
-    h1 {
-        text-align: center;
-        color: #333;
+    h2 {
+      color: #333;
     }
 
-    .measurement {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #ddd;
+    .status {
+      font-size: 1.2rem;
+      margin-top: 20px;
     }
 
-    .measurement:last-child {
-        border-bottom: none;
+    .connected {
+      color: green;
+      font-weight: bold;
     }
 
-    label {
-        font-weight: bold;
-        color: #555;
+    .disconnected {
+      color: red;
+      font-weight: bold;
     }
 
-    span {
-        color: #333;
+    .seatbelt {
+      font-size: 1.5rem;
+      margin-top: 10px;
     }
-</style>
-
+  </style>
+</head>
 <body>
-    <div class="container">
-        <h1>CAR STATUS</h1>
-        <div class="measurement">
-            <label for="seatbeltStatus">SEAT BELT STATUS</label>
-            <span id="seatbeltStatus">Loading...</span>
-        </div>
-    </div>
-</body>
 
+  <div class="card">
+    <h2>CAN Bus Live Status</h2>
+    <div class="status" id="wifiStatus">Loading WiFi status...</div>
+    <div class="seatbelt" id="seatbeltStatus">Loading Seatbelt status...</div>
+  </div>
+
+  <script>
+    async function fetchCANData() {
+      try {
+        const response = await fetch('can_receive.php');
+        const data = await response.json();
+
+        // WiFi Status
+        const wifiElem = document.getElementById('wifiStatus');
+        if (data.wifi_status === 'CONNECTED') {
+          wifiElem.textContent = "WiFi: CONNECTED";
+          wifiElem.className = "status connected";
+        } else {
+          wifiElem.textContent = "WiFi: DISCONNECTED";
+          wifiElem.className = "status disconnected";
+        }
+
+        // Seatbelt Status
+        const seatbeltElem = document.getElementById('seatbeltStatus');
+        seatbeltElem.textContent = "Seatbelt: " + data.seatbeltStatus;
+      } catch (error) {
+        document.getElementById('wifiStatus').textContent = "WiFi: ERROR";
+        document.getElementById('seatbeltStatus').textContent = "Seatbelt: ERROR";
+        console.error("Failed to fetch CAN data:", error);
+      }
+    }
+
+    // Fetch every 5 seconds
+    setInterval(fetchCANData, 5000);
+    fetchCANData(); // Initial call
+  </script>
+
+</body>
 </html>
