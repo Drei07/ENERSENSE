@@ -22,7 +22,7 @@
         }
 
         function updateDisplay(data) {
-            document.getElementById('voltage').textContent = data.seatbeltStatus + '';
+            document.getElementById('seatbeltStatus').textContent = data.seatbeltStatus + '';
         }
 
         // Fetch data every 5 seconds
@@ -78,32 +78,8 @@
     <div class="container">
         <h1>Electrical Measurements</h1>
         <div class="measurement">
-            <label for="voltage">Voltage (V):</label>
-            <span id="voltage">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="current">Current (A):</label>
-            <span id="current">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="power">Power (W):</label>
-            <span id="power">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="energyWh">Energy (Wh):</label>
-            <span id="energyWh">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="energyKWh">kWh:</label>
-            <span id="energyKWh">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="frequency">Frequency (Hz):</label>
-            <span id="frequency">Loading...</span>
-        </div>
-        <div class="measurement">
-            <label for="powerFactor">powerFactor :</label>
-            <span id="powerFactor">Loading...</span>
+            <label for="seatbeltStatus">SEAT BELT STATUS</label>
+            <span id="seatbeltStatus">Loading...</span>
         </div>
     </div>
 </body>
