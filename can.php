@@ -1,28 +1,37 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+// File to store the latest data
+$dataFile = 'latest_data.json';
+$timeoutDuration = 60; // 1 minute timeout duration
 
-$rawData = file_get_contents("php://input");
-$data = json_decode($rawData, true);
-
-if ($data && isset($data['device']) && isset($data['wifi_status'])) {
-    $device = htmlspecialchars($data['device']);
-    $wifiStatus = htmlspecialchars($data['wifi_status']);
-    $rssi = isset($data['rssi']) ? intval($data['rssi']) : 'N/A';
-
-    // Save to file (optional)
-    $log = "[" . date("Y-m-d H:i:s") . "] $device | $wifiStatus | RSSI: $rssi\n";
-    file_put_contents("wifi_log.txt", $log, FILE_APPEND);
-
-    echo json_encode([
-        "status" => "success",
-        "message" => "Data received successfully",
-        "received" => $data
-    ]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Receive data from ESP32 and save it to the file
+    $data = file_get_contents('php://input');
+    $dataArray = json_decode($data, true);
+    $dataArray['timestamp'] = time(); // Add a timestamp
+    file_put_contents($dataFile, json_encode($dataArray));
+    echo 'Data received';
 } else {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Invalid or missing data"
-    ]);
+    // Serve the latest data
+    if (file_exists($dataFile)) {
+        $data = json_decode(file_get_contents($dataFile), true);
+        $currentTime = time();
+        $dataAge = $currentTime - $data['timestamp'];
+        
+        if ($dataAge > $timeoutDuration) {
+            echo json_encode([
+                'wifi_status' => 'No device found',
+                'seatbeltStatus' => 0.0,
+
+            ]);
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        }
+    } else {
+        echo json_encode([
+            'wifi_status' => 'No device found',
+            'seatbeltStatus' => 0.0,
+        ]);
+    }
 }
 ?>
