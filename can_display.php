@@ -76,7 +76,7 @@
 
 <body>
     <div class="container">
-        <h1>Electrical Measurements</h1>
+        <h1>CAR STATUS</h1>
         <div class="measurement">
             <label for="seatbeltStatus">SEAT BELT STATUS</label>
             <span id="seatbeltStatus">Loading...</span>
