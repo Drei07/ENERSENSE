@@ -1,34 +1,37 @@
 <?php
-// can.php
+// File to store the latest data
+$dataFile = 'latest_data.json';
+$timeoutDuration = 60; // 1 minute timeout duration
 
-// Set content type to JSON (optional but good practice)
-header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Receive data from ESP32 and save it to the file
+    $data = file_get_contents('php://input');
+    $dataArray = json_decode($data, true);
+    $dataArray['timestamp'] = time(); // Add a timestamp
+    file_put_contents($dataFile, json_encode($dataArray));
+    echo 'Data received';
+} else {
+    // Serve the latest data
+    if (file_exists($dataFile)) {
+        $data = json_decode(file_get_contents($dataFile), true);
+        $currentTime = time();
+        $dataAge = $currentTime - $data['timestamp'];
+        
+        if ($dataAge > $timeoutDuration) {
+            echo json_encode([
+                'wifi_status' => 'No device found',
+                'seatbelt_status' => 0.0,
 
-// Read raw POST data (JSON)
-$input = file_get_contents('php://input');
-
-// Decode JSON to PHP associative array
-$data = json_decode($input, true);
-
-if ($data === null) {
-    // Invalid JSON or no data received
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid JSON']);
-    exit;
+            ]);
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        }
+    } else {
+        echo json_encode([
+            'wifi_status' => 'No device found',
+            'seatbelt_status' => 0.0,
+        ]);
+    }
 }
-
-// Example: Extract values from received data
-$seatbelt_status = isset($data['seatbelt_status']) ? $data['seatbelt_status'] : 'unknown';
-$wifi_status = isset($data['wifi_status']) ? $data['wifi_status'] : 'unknown';
-
-// You can log this data or process it as needed
-// For example, save to a file:
-$log_entry = date('Y-m-d H:i:s') . " - Seatbelt: $seatbelt_status, WiFi: $wifi_status\n";
-file_put_contents('can_log.txt', $log_entry, FILE_APPEND);
-
-// Respond back to Arduino
-echo json_encode([
-    'status' => 'success',
-    'received' => $data
-]);
 ?>
