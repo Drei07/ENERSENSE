@@ -1,11 +1,37 @@
 <?php
-$data = json_decode(file_get_contents("php://input"), true);
+// File to store the latest data
+$dataFile = 'latest_data.json';
+$timeoutDuration = 60; // 1 minute timeout duration
 
-if (isset($data['seatbelt_status'])) {
-    $status = $data['seatbelt_status'];
-    file_put_contents("log.txt", "Seatbelt Status: $status\n", FILE_APPEND);
-    echo json_encode(["status" => "success", "received" => $status]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Receive data from ESP32 and save it to the file
+    $data = file_get_contents('php://input');
+    $dataArray = json_decode($data, true);
+    $dataArray['timestamp'] = time(); // Add a timestamp
+    file_put_contents($dataFile, json_encode($dataArray));
+    echo 'Data received';
 } else {
-    echo json_encode(["status" => "error", "message" => "Missing seatbelt_status"]);
+    // Serve the latest data
+    if (file_exists($dataFile)) {
+        $data = json_decode(file_get_contents($dataFile), true);
+        $currentTime = time();
+        $dataAge = $currentTime - $data['timestamp'];
+        
+        if ($dataAge > $timeoutDuration) {
+            echo json_encode([
+                'wifi_status' => 'No device found',
+                'seatbelt_status' => 0.0,
+
+            ]);
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        }
+    } else {
+        echo json_encode([
+            'wifi_status' => 'No device found',
+            'seatbelt_status' => 0.0,
+        ]);
+    }
 }
 ?>
