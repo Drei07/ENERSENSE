@@ -90,7 +90,7 @@
         </div>
         <div class="measurement">
             <label for="current">Current (A):</label>
-            <span id="current">Loading...</span>
+            <span id="current">Loading...></span>
         </div>
         <div class="measurement">
             <label for="power">Power (W):</label>
